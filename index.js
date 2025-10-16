@@ -68,9 +68,9 @@ if (process.argv.length < 3) {
     process.exit(1)
 }
 
-const password = process.argv[2]
+// const password = process.argv[2]
 
-const Person = mongoose.model('Person', personSchema)
+// const Person = mongoose.model('Person', personSchema)
 
 if (process.argv.length === 3) {
 
