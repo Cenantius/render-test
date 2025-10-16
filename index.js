@@ -1,5 +1,8 @@
 // käytännössä sama kuin "import http from 'http'"
+require('dotenv').config()
 const express = require('express')
+const Person = require('./models/person')
+
 const app = express()
 
 app.use(express.json())
@@ -58,6 +61,40 @@ let persons = [
   { id: "24", name: "Kaisa Peltonen",     number: "040-123024" },
   { id: "25", name: "Lauri Vainio",       number: "040-123025" }
 ]
+// ALKAA TÄSTÄ
+
+if (process.argv.length < 3) {
+    console.log('give password as argument')
+    process.exit(1)
+}
+
+const password = process.argv[2]
+
+const Person = mongoose.model('Person', personSchema)
+
+if (process.argv.length === 3) {
+
+    Person.find({}).then(result => {
+        console.log('phonebook:')
+        result.forEach(person => {
+            console.log(person.name + ' ' + person.number)
+        })
+        mongoose.connection.close()
+    })
+}
+
+if (process.argv.length === 5) {
+    const person = new Person({
+        name: process.argv[3],
+        number: process.argv[4],
+    })
+
+    person.save().then(result => {
+    console.log('added ' + person.name + ' number ' + person.number + ' to phonebook')
+    mongoose.connection.close()
+    })
+}
+// LOPPUU TÄHÄN
 
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
@@ -77,7 +114,9 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -120,7 +159,8 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
