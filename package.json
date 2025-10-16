@@ -10,11 +10,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../../osa2/puhelinluettelo && npm run build && @powershell Copy-Item dist -Recurse ../../osa2/puhelinluettelo",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "build:ui": "powershell -NoProfile -Command \"Remove-Item -Recurse -Force ./dist -ErrorAction SilentlyContinue; Push-Location ../../osa2/puhelinluettelo; npm run build; Pop-Location; New-Item -ItemType Directory -Force ./dist | Out-Null; Copy-Item ../../osa2/puhelinluettelo/dist/* -Destination ./dist -Recurse -Force\"",
+    "deploy:full": "powershell -NoProfile -Command \"npm run build:ui; git add -A; git diff --cached --quiet; if ($LASTEXITCODE -ne 0) { git commit -m uibuild }; git push\""
   },
   "dependencies": {
     "express": "^5.1.0",
+    "mongoose": "^8.19.1",
     "morgan": "^1.10.1"
   }
 }
